@@ -4,10 +4,10 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import re
-from unittest import result
 
 USERS = {'admin': ['', 0, False], 'settings': ['',[True, True, True], True]} # структура - (пароль, спроби входу, бан)
 
+# загрузка даних з файлу, або створення
 if os.path.isfile('database.json'):
     with open('database.json', 'r') as fp:
         USERS = json.load(fp)
@@ -21,7 +21,7 @@ class User():
     def __init__(self, login):
         self.login = login
 
-    def reset_attempts(self):
+    def reset_attempts(self): 
         USERS[self.login][1] = 0
         with open('database.json', 'w') as fp:
             json.dump(USERS, fp)
@@ -59,7 +59,7 @@ class User():
         
         if password1 == password2:
             
-            result = check_password(password1)
+            result = check_password(password1) # перевірка пароля згідно опцій
 
             if result[0] & result[1] & result[2]:
                 USERS[login][0] = password1
@@ -144,7 +144,7 @@ class User():
 
     def menu(self, root):
         clear_window(root)
-        self.reset_attempts()
+        self.reset_attempts() # скидання спроб неправильного пароля, при вдалому вході
         root.title('Menu')
         tk.Label(root, text=f'You are "{self.login}"').pack()
         
@@ -270,6 +270,7 @@ class Admin(User):
         table.heading("Blocked",text="Blocked", anchor='center')
         i = 0
         for login in USERS.keys():
+            if login == "settings": continue
             table.insert(parent='',index='end',iid=i,text='', values=(login,USERS[login][0],USERS[login][2]))
             i +=1
         table.pack()
@@ -314,12 +315,11 @@ class Admin(User):
         else:
             messagebox.showerror("Error", "Login not found")
 
-
-def exit(root):
+def exit(root): # виход з аккаунту
     clear_window(root)
     login_window(root)
 
-def clear_window(root):
+def clear_window(root): # очищення вікна від елементів
     for widget in root.winfo_children():
         widget.destroy()
 
@@ -375,7 +375,7 @@ def check_user(login, password):
         messagebox.showerror("Error", "Login doesn`t exist")
     #print(login, password)
 
-def show_info(root):
+def show_info(root): # довідка
     clear_window(root)
     root.title('Info')
     tk.Label(root, text=f'This program was created by Leonid Kurgan').pack()    
@@ -410,12 +410,7 @@ def login_window(root):
     button = ttk.Button(root, text="Info", width=25, command=lambda: show_info(root))
     button.pack(pady=40)
 
-    
-
-
-
 root = tk.Tk()
 login_window(root)
 
 root.mainloop()
-
